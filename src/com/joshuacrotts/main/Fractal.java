@@ -2,7 +2,7 @@ package com.joshuacrotts.main;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
-import java.math.BigDecimal;
+import java.util.Stack;
 
 import com.revivedstandards.util.StandardComplexNumber;
 import com.revivedstandards.util.StdOps;
@@ -12,14 +12,15 @@ public class Fractal {
   /* Parent window instance. */
   private final FractalGenerator FRACTAL_WINDOW;
   
-  /* BufferedImage that we write to when generating the fractal. */
-  private BufferedImage fractalImage;
-  
-  /* Equation information. */
-  private int exponent;
+  /* Stack of FractalSerializerObject that we write to when generating the fractal.
+   * We always render the top image on the stack. */
+  private final Stack<FractalSerializerObject> FRACTAL_IMAGES;
 
   /* To generate a different fractal, the +c has to be modified. */
   private StandardComplexNumber complexNumber;
+  
+  /* Equation information. */
+  private int exponent = 2;
   
   /* Number of iterations. */
   private int maxIterations;
@@ -30,11 +31,17 @@ public class Fractal {
   
   public Fractal(FractalGenerator window, int iterations, StandardComplexNumber c) {
     this.FRACTAL_WINDOW = window;
-    this.complexNumber = c;
-    this.fractalImage = null;
-    this.exponent = 2;
+    this.FRACTAL_IMAGES = new Stack<>();
     
+    this.complexNumber = c;
     this.maxIterations = iterations;
+  }
+  
+  /** 
+   * Removes the top fractal from the stack. 
+   */
+  public FractalSerializerObject popTopFractal() {
+    return this.FRACTAL_IMAGES.pop();
   }
   
   /**
@@ -54,12 +61,10 @@ public class Fractal {
     final int WIDTH = this.FRACTAL_WINDOW.getWidth();
     final int HEIGHT = this.FRACTAL_WINDOW.getHeight();
         
-    BufferedImage fractal = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_ARGB);
+    BufferedImage fractal = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
     
     for (int x = 0; x < WIDTH; x++) {
       for (int y = 0; y < HEIGHT; y++) {
-        int iterations = 0;
-
         double xc = StdOps.normalize(x, 0, WIDTH, minComplexX, maxComplexX);
         double yc = StdOps.normalize(y, 0, HEIGHT, minComplexY, maxComplexY);
 
@@ -71,11 +76,7 @@ public class Fractal {
           c = new StandardComplexNumber(xc, yc);
         }
 
-        // Make sure we're still inside the interval for the fractal.
-        while (z.getReal() * z.getReal() + z.getImaginary() * z.getImaginary() <= 4.0 && iterations < this.maxIterations) {
-          z = z.pow(this.exponent).add(c);
-          iterations++;
-        }
+        int iterations = this.fractalHelper(z, c);
         
         // If we are beyond the number of iterations, we color it
         // from our array of colors.
@@ -87,7 +88,33 @@ public class Fractal {
       }
     }
 
-    this.fractalImage = fractal;
+    // Once we generate an image, push it to the stack of previous
+    // images. We need to use the old set of complex coordinates.
+    this.FRACTAL_IMAGES.push(new FractalSerializerObject(
+        this.FRACTAL_WINDOW.getMinComplexX(),
+        this.FRACTAL_WINDOW.getMaxComplexX(), 
+        this.FRACTAL_WINDOW.getMinComplexY(),
+        this.FRACTAL_WINDOW.getMaxComplexY(), fractal));
+  }
+  
+  /**
+   * Generates the number of iterations. Makes sure that we stay inside the 
+   * fractal set of points.
+   * 
+   * @param z
+   * @param c
+   * @param n
+   * @return 
+   */
+  private int fractalHelper(StandardComplexNumber z, StandardComplexNumber c) {
+    int iterations = 0;
+    while (z.getReal() * z.getReal() + z.getImaginary() * z.getImaginary() <= 4.0 
+            && iterations < this.maxIterations) {
+      z = z.pow(this.exponent).add(c);
+      iterations++;
+    }
+    
+    return iterations;
   }
 
   /**
@@ -125,7 +152,15 @@ public class Fractal {
 	  this.exponent = exp;
   }
   
-  public BufferedImage getImage() {
-    return this.fractalImage;
+  public FractalSerializerObject getTopFractal() {
+    return this.FRACTAL_IMAGES.peek();
+  }
+
+  public Stack<FractalSerializerObject> getFractals() {
+    return this.FRACTAL_IMAGES;
+  }
+  
+  public boolean hasFractals() {
+    return !this.FRACTAL_IMAGES.isEmpty();
   }
 }

@@ -6,6 +6,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="lib" path="/Users/joshuacrotts/Desktop/Files/Programming/Fractal-Generator/lib/Standards.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Joshua/Desktop/Files/Java/Fractal Generator/lib/Standards.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

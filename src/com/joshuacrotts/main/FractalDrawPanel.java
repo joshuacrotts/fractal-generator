@@ -1,9 +1,7 @@
 package com.joshuacrotts.main;
 
 import java.awt.Graphics;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
+import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
 
@@ -35,7 +33,11 @@ public class FractalDrawPanel extends JPanel {
   public void paintComponent(Graphics g) {
     super.paintComponent(g);
     
-    g.drawImage(this.FRACTAL.getImage(), 0, 0, null);
+    // If we have fractals then we can use the top one (not remove it!).
+    if (this.FRACTAL.hasFractals()) {
+      BufferedImage fractalImage = this.FRACTAL.getTopFractal().getImage();
+      g.drawImage(fractalImage, 0, 0, null);
+    }
     
     this.ZOOM_SELECTOR.drawRectangle(g);
   }

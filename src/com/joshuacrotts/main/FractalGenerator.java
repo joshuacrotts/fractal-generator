@@ -60,6 +60,8 @@ public class FractalGenerator extends StandardSwingApplication {
     this.fractal.setMaxIterations(INITIAL_ITERATIONS);
   }
   
+// =================== GETTERS AND SETTERS ====================//
+  
   public int getWidth() {
     return super.getFrame().getPreferredSize().width;
   }
