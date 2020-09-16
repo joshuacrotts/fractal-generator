@@ -22,7 +22,9 @@ public class FractalResetButton extends JButton implements ActionListener {
   }
 
   /**
-   * 
+   * After pressing the button, the zoom status is reset.
+   * To redraw the fractal at the default camera view,
+   * press the draw button again.
    */
   @Override
   public void actionPerformed(ActionEvent e) {
@@ -30,7 +32,7 @@ public class FractalResetButton extends JButton implements ActionListener {
   }
 
   /**
-   * 
+   * Draws all subchildren.
    * @param Graphics g
    */
   @Override

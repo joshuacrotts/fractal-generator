@@ -28,6 +28,9 @@ public class FractalZoomSelector extends MouseAdapter {
   }
 
   /**
+   * Draws the rectangle specified by where the user first clicks,
+   * to where they are dragging the mouse (this point is the bottom-right
+   * of the rectangle).
    * 
    * @param g
    */
@@ -38,6 +41,12 @@ public class FractalZoomSelector extends MouseAdapter {
     }
   }
 
+  /**
+   * Sets the top-left coordinates of the "drag" rectangle
+   * upon pressing the mouse.
+   * 
+   * @param MouseEvent e
+   */
   @Override
   public void mousePressed(MouseEvent e) {
     if (!this.isPressed) {
@@ -47,6 +56,12 @@ public class FractalZoomSelector extends MouseAdapter {
     }
   }
 
+  /**
+   * Sets the canvas/frame edges to a normalized
+   * complex coordinate. Also resets the mouse flags.
+   * 
+   *  @param MouseEvent e.
+   */
   @Override
   public void mouseReleased(MouseEvent e) {
     if (this.isPressed) {
@@ -59,10 +74,17 @@ public class FractalZoomSelector extends MouseAdapter {
     }
   }
 
+  /**
+   * Not used.
+   */
   @Override
   public void mouseMoved(MouseEvent e) {
   }
 
+  /**
+   * Calculates the length and width of the rectangle
+   * to draw.
+   */
   @Override
   public void mouseDragged(MouseEvent e) {
     if (this.isPressed) {
@@ -72,7 +94,11 @@ public class FractalZoomSelector extends MouseAdapter {
   }
 
   /**
-   * 
+   * Normalizes the canvas drawing window starting
+   * from the top-left of the rectangle and the bottom-right.
+   * These coordinates are normalized to the complex set and 
+   * the fractal is re-drawn using these as the min/max values
+   * of the canvas (JPanel).
    */
   private void normalizeCanvasEdges() {
     int fw = this.FRACTAL_WINDOW.getWidth();
@@ -101,7 +127,7 @@ public class FractalZoomSelector extends MouseAdapter {
   }
   
   /**
-   * 
+   * Resets all flags on the mouse.
    */
   private void resetMouse() {
     this.isPressed = false;
@@ -110,7 +136,9 @@ public class FractalZoomSelector extends MouseAdapter {
     this.deltaRectX = 0;
     this.deltaRectY = 0;
   }
-
+  
+  // =================== GETTERS AND SETTERS ====================//
+  
   public boolean isPressed() {
     return this.isPressed;
   }

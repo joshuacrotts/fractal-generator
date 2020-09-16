@@ -29,6 +29,10 @@ public class FractalUITopPanel extends JPanel {
     super.add(this.RESET_FRACTAL_BUTTON, 0, 1);
   }
   
+  /**
+   * Draws all subchildren.
+   * @param Graphics g
+   */
   @Override
   public void paintComponent(Graphics g) {
     super.paintComponent(g);

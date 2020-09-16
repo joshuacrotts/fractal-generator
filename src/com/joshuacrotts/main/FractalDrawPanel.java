@@ -28,7 +28,8 @@ public class FractalDrawPanel extends JPanel {
   }
   
   /**
-   * 
+   * Draws the fractal BufferedImage, and the rectangle for
+   * when we want to zoom in on the fractal.
    */
   @Override
   public void paintComponent(Graphics g) {
@@ -38,6 +39,8 @@ public class FractalDrawPanel extends JPanel {
     
     this.ZOOM_SELECTOR.drawRectangle(g);
   }
+ 
+ // =================== GETTERS AND SETTERS ====================//
   
   public Fractal getFractal() {
     return this.FRACTAL;

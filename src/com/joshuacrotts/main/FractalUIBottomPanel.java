@@ -11,14 +11,17 @@ public class FractalUIBottomPanel extends JPanel {
   private final FractalDrawPanel FRACTAL_PANEL;
   
   /* UI elements for the panel. */
-  private final FractalTextEntry FRACTAL_TEXT_ENTRY;
+  private final FractalEquationTextEntry FRACTAL_EQUATION_TEXT_ENTRY;
+  private final FractalIterationTextEntry FRACTAL_ITERATION_TEXT_ENTRY;
   
   public FractalUIBottomPanel(FractalGenerator parentWindow, FractalDrawPanel drawPanel) {
     this.FRACTAL_WINDOW = parentWindow;
     this.FRACTAL_PANEL = drawPanel;
-    this.FRACTAL_TEXT_ENTRY = new FractalTextEntry(parentWindow, drawPanel);
+    this.FRACTAL_EQUATION_TEXT_ENTRY = new FractalEquationTextEntry(parentWindow, drawPanel);
+    this.FRACTAL_ITERATION_TEXT_ENTRY = new FractalIterationTextEntry(parentWindow, drawPanel);
     
-    super.add(this.FRACTAL_TEXT_ENTRY);
+    super.add(this.FRACTAL_EQUATION_TEXT_ENTRY);
+    super.add(this.FRACTAL_ITERATION_TEXT_ENTRY);
   }
   
   @Override

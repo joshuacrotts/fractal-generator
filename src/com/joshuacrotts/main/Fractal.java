@@ -2,6 +2,7 @@ package com.joshuacrotts.main;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
+import java.math.BigDecimal;
 
 import com.revivedstandards.util.StandardComplexNumber;
 import com.revivedstandards.util.StdOps;
@@ -14,11 +15,14 @@ public class Fractal {
   /* BufferedImage that we write to when generating the fractal. */
   private BufferedImage fractalImage;
   
+  /* Equation information. */
+  private int exponent;
+
   /* To generate a different fractal, the +c has to be modified. */
   private StandardComplexNumber complexNumber;
   
   /* Number of iterations. */
-  private final int MAX_ITERATIONS;
+  private int maxIterations;
   
   public Fractal(FractalGenerator window, int iterations) {
     this(window, iterations, null);
@@ -28,18 +32,24 @@ public class Fractal {
     this.FRACTAL_WINDOW = window;
     this.complexNumber = c;
     this.fractalImage = null;
+    this.exponent = 2;
     
-    this.MAX_ITERATIONS = iterations;
+    this.maxIterations = iterations;
   }
   
   /**
+   * Generates the fractal with the given interval [-x, x],
+   * [-y, y]. If the constant c is null, the mandelbrot constant
+   * is used.
    * 
-   * @param n
-   * @return
+   * @param minComplexX
+   * @param maxComplexX
+   * @param minComplexY
+   * @param minComplexY
    */
   public void mandelbrot(double minComplexX, double maxComplexX, 
                          double minComplexY, double maxComplexY) {
-    int[] colorMap = generateColorMap(this.MAX_ITERATIONS);
+    int[] colorMap = generateColorMap(this.maxIterations);
 
     final int WIDTH = this.FRACTAL_WINDOW.getWidth();
     final int HEIGHT = this.FRACTAL_WINDOW.getHeight();
@@ -56,17 +66,20 @@ public class Fractal {
         StandardComplexNumber z = new StandardComplexNumber(xc, yc);
         StandardComplexNumber c = this.complexNumber;
         
-        // If it's null, then use the mandelbrot fractal. 
+        // If c is null, then use the default mandelbrot constant.
         if (c == null) {
           c = new StandardComplexNumber(xc, yc);
         }
 
-        while (z.abs().getReal() <= 2.0 && iterations < this.MAX_ITERATIONS) {
-          z = z.pow(2).add(c);
+        // Make sure we're still inside the interval for the fractal.
+        while (z.getReal() * z.getReal() + z.getImaginary() * z.getImaginary() <= 4.0 && iterations < this.maxIterations) {
+          z = z.pow(this.exponent).add(c);
           iterations++;
         }
-
-        if (iterations < this.MAX_ITERATIONS) {
+        
+        // If we are beyond the number of iterations, we color it
+        // from our array of colors.
+        if (iterations < this.maxIterations) {
           fractal.setRGB(x, y, colorMap[iterations]);
         } else {
           fractal.setRGB(x, y, Color.BLACK.getRGB());
@@ -78,9 +91,11 @@ public class Fractal {
   }
 
   /**
+   * Generates n colors to use for detecting "closeness" to the
+   * center of the fractal. 
    * 
    * @param n
-   * @return
+   * @return int[] array of colors.
    */
   private int[] generateColorMap(int n) {
     int[] colorMap = new int[n];
@@ -92,12 +107,22 @@ public class Fractal {
     return colorMap;
   }
   
+// =================== GETTERS AND SETTERS ====================//
+  
   public int getMaxIterations() {
-    return this.MAX_ITERATIONS;
+    return this.maxIterations;
+  }
+  
+  public void setMaxIterations(int iterations) {
+    this.maxIterations = iterations;
   }
   
   public void setComplexNumber(StandardComplexNumber scn) {
     this.complexNumber = scn;
+  }
+  
+  public void setExponent(int exp) {
+	  this.exponent = exp;
   }
   
   public BufferedImage getImage() {

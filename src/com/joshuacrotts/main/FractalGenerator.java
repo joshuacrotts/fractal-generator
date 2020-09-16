@@ -5,15 +5,15 @@ import java.awt.BorderLayout;
 import com.revivedstandards.platform.StandardSwingApplication;
 
 public class FractalGenerator extends StandardSwingApplication {
-
+  
+  /* Default number of iterations. */
+  private static final int INITIAL_ITERATIONS = 2000;
+  
   /* JComponents and panels for drawing and interacting. */
   private final FractalDrawPanel FRACTAL_PANEL;
   private final FractalUITopPanel FRACTAL_UI_TOP_PANEL;
   private final FractalUIBottomPanel FRACTAL_UI_BOTTOM_PANEL;
-  
-  /* Fractal instance. */
-  private Fractal fractal;
-  
+
   /* Initial scale for the frame if we want to reset our zoom factor. */
   private final double INITIAL_MIN_COMPLEX = -2.0;
   private final double INITIAL_MAX_COMPLEX = 2.0;
@@ -24,10 +24,13 @@ public class FractalGenerator extends StandardSwingApplication {
   private double minComplexY = -2.0;
   private double maxComplexY = 2.0;
   
+  /* Fractal instance. */
+  private Fractal fractal;
+  
   public FractalGenerator(int width, int height, int fps, String title) {
     super(width, height, fps, title);
     
-    this.fractal = new Fractal(this, 5000);
+    this.fractal = new Fractal(this, INITIAL_ITERATIONS);
     
     this.FRACTAL_PANEL = new FractalDrawPanel(this, fractal);
     this.FRACTAL_UI_TOP_PANEL = new FractalUITopPanel(this, this.FRACTAL_PANEL);
@@ -53,6 +56,8 @@ public class FractalGenerator extends StandardSwingApplication {
     
     this.minComplexY = this.INITIAL_MIN_COMPLEX;
     this.maxComplexY = this.INITIAL_MAX_COMPLEX;
+    
+    this.fractal.setMaxIterations(INITIAL_ITERATIONS);
   }
   
   public int getWidth() {

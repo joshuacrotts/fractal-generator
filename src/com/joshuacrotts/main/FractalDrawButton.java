@@ -22,7 +22,7 @@ public class FractalDrawButton extends JButton implements ActionListener {
   }
 
   /**
-   * 
+   * After pressing the button, the fractal is drawn.
    */
   @Override
   public void actionPerformed(ActionEvent e) {
@@ -32,7 +32,7 @@ public class FractalDrawButton extends JButton implements ActionListener {
   }
 
   /**
-   * 
+   * Paints all subchildren.
    * @param Graphics g
    */
   @Override
