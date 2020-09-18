@@ -26,7 +26,7 @@ public class FractalDrawButton extends JButton implements ActionListener {
    */
   @Override
   public void actionPerformed(ActionEvent e) {
-    this.FRACTAL_PANEL.getFractal().mandelbrot(this.FRACTAL_WINDOW.getMinComplexX(),
+    this.FRACTAL_PANEL.getFractal().createFractal(this.FRACTAL_WINDOW.getMinComplexX(),
         this.FRACTAL_WINDOW.getMaxComplexX(), this.FRACTAL_WINDOW.getMinComplexY(),
         this.FRACTAL_WINDOW.getMaxComplexY());
   }
