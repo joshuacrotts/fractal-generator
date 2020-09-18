@@ -117,7 +117,7 @@ public class FractalZoomSelector extends MouseAdapter {
     double newComplexMaxY = StdOps.normalize(this.deltaRectY, 0, fh, this.FRACTAL_WINDOW.getMinComplexY(),
         this.FRACTAL_WINDOW.getMaxComplexY());
 
-    this.FRACTAL_PANEL.getFractal().mandelbrot(newComplexMinX, newComplexMaxX, newComplexMinY, newComplexMaxY);
+    this.FRACTAL_PANEL.getFractal().createFractal(newComplexMinX, newComplexMaxX, newComplexMinY, newComplexMaxY);
 
     // Set the new edges of our canvas.
     this.FRACTAL_WINDOW.setMinComplexX(newComplexMinX);

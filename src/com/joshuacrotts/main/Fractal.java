@@ -54,7 +54,7 @@ public class Fractal {
    * @param minComplexY
    * @param minComplexY
    */
-  public void mandelbrot(double minComplexX, double maxComplexX, 
+  public void createFractal(double minComplexX, double maxComplexX, 
                          double minComplexY, double maxComplexY) {
     int[] colorMap = generateColorMap(this.maxIterations);
 
@@ -76,7 +76,7 @@ public class Fractal {
           c = new StandardComplexNumber(xc, yc);
         }
 
-        int iterations = this.fractalHelper(z, c);
+        int iterations = this.createFractalHelper(z, c);
         
         // If we are beyond the number of iterations, we color it
         // from our array of colors.
@@ -106,7 +106,7 @@ public class Fractal {
    * @param n
    * @return 
    */
-  private int fractalHelper(StandardComplexNumber z, StandardComplexNumber c) {
+  private int createFractalHelper(StandardComplexNumber z, StandardComplexNumber c) {
     int iterations = 0;
     while (z.getReal() * z.getReal() + z.getImaginary() * z.getImaginary() <= 4.0 
             && iterations < this.maxIterations) {
