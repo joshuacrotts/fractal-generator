@@ -2,14 +2,35 @@ package com.joshuacrotts.main;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
+import java.util.Queue;
 import java.util.Stack;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.revivedstandards.util.StandardComplexNumber;
 import com.revivedstandards.util.StdOps;
 
 public class Fractal {
 
+  private class ComplexPairs {
+    protected final double minX;
+    protected final double minY;
+    protected final double maxX;
+    protected final double maxY;
+    protected final int maxRow;
+    protected final int minRow;
+    public ComplexPairs(double minX, double maxX, double minY, double maxY,
+                        int minRow, int maxRow) {
+      this.minX = minX;
+      this.minY = minY;
+      this.maxX = maxX;
+      this.maxY = maxY;
+      this.minRow = minRow;
+      this.maxRow = maxRow;
+    }
+  }
+  
   /* Threads for multi-threaded rendering. */
+  private final ConcurrentLinkedQueue<ComplexPairs> complexPairsQueue;
   private final Thread[] THREADS;
 
   /* Parent window instance. */
@@ -31,7 +52,7 @@ public class Fractal {
   private final int[] colorMap;
 
   /* Max number of threads to use for parallelization. */
-  private final int MAX_THREADS = 50;
+  private final int MAX_THREADS = 100;
 
   /* Equation information. */
   private int exponent = 2;
@@ -46,6 +67,7 @@ public class Fractal {
   public Fractal(FractalGenerator window, int iterations, StandardComplexNumber c) {
     this.FRACTAL_WINDOW = window;
     this.FRACTAL_IMAGES = new Stack<>();
+    this.complexPairsQueue = new ConcurrentLinkedQueue<>();
     this.THREADS = new Thread[MAX_THREADS];
 
     this.complexNumber = c;
@@ -65,21 +87,16 @@ public class Fractal {
    */
   public void createFractal(double minComplexX, double maxComplexX, double minComplexY, double maxComplexY) {
     // Spin up the threads.
-    for (int i = 0; i < this.THREADS.length; i++) {
-      this.THREADS[i] = new FractalThread(this.FRACTAL_WINDOW, this, i, MAX_THREADS, minComplexX, maxComplexX,
-          minComplexY, maxComplexY);
-      this.THREADS[i].start();
-    }
+    this.createThreads(minComplexX, maxComplexX, minComplexY, maxComplexY);
 
     // Join the threads (force them to wait) if they are not done.
     this.joinThreads();
-    
+
     // Saves the previous fractal data so we can use it if we want to
     // undo.
-    this.FRACTAL_IMAGES.push(new FractalSerializerObject(
-        this.FRACTAL_WINDOW.getMinComplexX(), this.FRACTAL_WINDOW.getMaxComplexX(), 
-        this.FRACTAL_WINDOW.getMinComplexY(), this.FRACTAL_WINDOW.getMaxComplexY(), 
-        FractalUtils.deepCopyImage(fractal)));
+    this.FRACTAL_IMAGES.push(new FractalSerializerObject(this.FRACTAL_WINDOW.getMinComplexX(),
+        this.FRACTAL_WINDOW.getMaxComplexX(), this.FRACTAL_WINDOW.getMinComplexY(),
+        this.FRACTAL_WINDOW.getMaxComplexY(), FractalUtils.deepCopyImage(fractal)));
   }
 
   /**
@@ -90,8 +107,32 @@ public class Fractal {
   }
 
   /**
-   * If the threads are still active, we don't proceed.
-   * This is a slightly faster version of Thread.join();
+   * Starts the threads.
+   * 
+   * @param void.
+   * 
+   * @return void.
+   */
+  private synchronized void createThreads(double minComplexX, double maxComplexX, 
+                                          double minComplexY, double maxComplexY) {
+    for (int i = 0; i < this.MAX_THREADS; i++) {
+      int minRow = ((i * this.FRACTAL_WINDOW.getHeight()) / this.MAX_THREADS);
+      int maxRow = (((i + 1) * this.FRACTAL_WINDOW.getHeight()) / this.MAX_THREADS);
+
+      ComplexPairs p = new ComplexPairs(minComplexX, maxComplexX, minComplexY, maxComplexY, minRow, maxRow);
+      this.complexPairsQueue.add(p);
+    }
+    
+    // Spin up the threads.
+    for (int i = 0; i < this.MAX_THREADS; i++) {
+      this.THREADS[i] = new FractalThread(this.FRACTAL_WINDOW, this, this.complexPairsQueue);
+      this.THREADS[i].start();
+    }
+  }
+
+  /**
+   * If the threads are still active, we don't proceed. This is a slightly faster
+   * version of Thread.join();
    * 
    * @param void.
    * 
@@ -161,33 +202,27 @@ public class Fractal {
    * This class spawns a thread for the fractal to use during the generation.
    */
   private class FractalThread extends Thread {
-    
+
     /* Parent window and fractal objects. */
     private final FractalGenerator FRACTAL_WINDOW;
     private final Fractal FRACTAL;
+    
+    private final ConcurrentLinkedQueue<ComplexPairs> queue;
+    private ComplexPairs currentPair;
 
-    /* The rows that the iterator will start, and end at. */
-    private final int MIN_ROW;
-    private final int MAX_ROW;
-
-    /* Edges of the canvas for the fractal. */
-    private double minComplexX, maxComplexX, minComplexY, maxComplexY;
-
-    public FractalThread(FractalGenerator fractalWindow, Fractal fractal, int id, int maxThreads, double minX,
-        double maxX, double minY, double maxY) {
+    public FractalThread(FractalGenerator fractalWindow, Fractal fractal, ConcurrentLinkedQueue<ComplexPairs> queue) {
       this.FRACTAL_WINDOW = fractalWindow;
       this.FRACTAL = fractal;
-      this.MIN_ROW = ((id * this.FRACTAL_WINDOW.getHeight()) / maxThreads);
-      this.MAX_ROW = (((id + 1) * this.FRACTAL_WINDOW.getHeight()) / maxThreads);
-      this.minComplexX = minX;
-      this.maxComplexX = maxX;
-      this.minComplexY = minY;
-      this.maxComplexY = maxY;
+      this.queue = queue;
     }
 
     @Override
     public void run() {
-      this.generateFractal(minComplexX, maxComplexX, minComplexY, maxComplexY);
+      while (!this.queue.isEmpty()) {
+        ComplexPairs p = this.queue.poll();
+        if (p != null)
+        this.generateFractal(p);
+      }
     }
 
     /**
@@ -199,15 +234,14 @@ public class Fractal {
      * @param minComplexY
      * @param minComplexY
      */
-    private synchronized void generateFractal(double minComplexX, double maxComplexX, 
-                                              double minComplexY, double maxComplexY) {
+    private synchronized void generateFractal(ComplexPairs complexPair) {
       final int WIDTH = this.FRACTAL_WINDOW.getWidth();
       final int HEIGHT = this.FRACTAL_WINDOW.getHeight();
 
-      for (int x = MIN_ROW; x < MAX_ROW; x++) {
+      for (int x = complexPair.minRow; x < complexPair.maxRow; x++) {
         for (int y = 0; y < HEIGHT; y++) {
-          double xc = StdOps.normalize(x, 0, WIDTH, minComplexX, maxComplexX);
-          double yc = StdOps.normalize(y, 0, HEIGHT, minComplexY, maxComplexY);
+          double xc = StdOps.normalize(x, 0, WIDTH, complexPair.minX, complexPair.maxX);
+          double yc = StdOps.normalize(y, 0, HEIGHT, complexPair.minY, complexPair.maxY);
 
           StandardComplexNumber z = new StandardComplexNumber(xc, yc);
           StandardComplexNumber c = this.FRACTAL.complexNumber;
