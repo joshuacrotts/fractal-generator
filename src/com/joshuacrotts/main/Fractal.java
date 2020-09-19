@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.util.Stack;
 
+import com.revivedstandards.main.StandardDraw;
 import com.revivedstandards.util.StandardComplexNumber;
 import com.revivedstandards.util.StdOps;
 
@@ -55,11 +56,11 @@ public class Fractal {
    * @param minComplexY
    */
   public void createFractal(double minComplexX, double maxComplexX, 
-                         double minComplexY, double maxComplexY) {
+                            double minComplexY, double maxComplexY) {
     int[] colorMap = generateColorMap(this.maxIterations);
 
-    final int WIDTH = this.FRACTAL_WINDOW.getWidth();
-    final int HEIGHT = this.FRACTAL_WINDOW.getHeight();
+    final int WIDTH = this.FRACTAL_WINDOW.getDrawPanelWidth();
+    final int HEIGHT = this.FRACTAL_WINDOW.getDrawPanelWidth();
         
     BufferedImage fractal = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
     
@@ -83,7 +84,7 @@ public class Fractal {
         if (iterations < this.maxIterations) {
           fractal.setRGB(x, y, colorMap[iterations]);
         } else {
-          fractal.setRGB(x, y, Color.BLACK.getRGB());
+          fractal.setRGB(x, y, StandardDraw.BARN_RED.getRGB());
         }
       }
     }
@@ -128,7 +129,7 @@ public class Fractal {
     int[] colorMap = new int[n];
 
     for (int i = 0; i < n; i++) {
-      colorMap[i] = Color.HSBtoRGB(i / 256f, 1, i / (i + 8f));
+      colorMap[i] = Color.HSBtoRGB(i / 256f, 1.f, i / (i + 8f));
     }
 
     return colorMap;

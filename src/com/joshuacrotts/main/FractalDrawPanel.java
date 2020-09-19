@@ -1,5 +1,6 @@
 package com.joshuacrotts.main;
 
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
@@ -20,6 +21,8 @@ public class FractalDrawPanel extends JPanel {
     this.FRACTAL_WINDOW = frameWindow;
     this.FRACTAL = fractal;
     this.ZOOM_SELECTOR = new FractalZoomSelector(this.FRACTAL_WINDOW, this);
+    super.setPreferredSize(new Dimension(this.FRACTAL_WINDOW.getFrame().getHeight(), 
+                                         this.FRACTAL_WINDOW.getFrame().getHeight())); 
     
     super.addMouseListener(this.ZOOM_SELECTOR);
     super.addMouseMotionListener(this.ZOOM_SELECTOR);

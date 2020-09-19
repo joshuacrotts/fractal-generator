@@ -101,8 +101,8 @@ public class FractalZoomSelector extends MouseAdapter {
    * of the canvas (JPanel).
    */
   private void normalizeCanvasEdges() {
-    int fw = this.FRACTAL_WINDOW.getWidth();
-    int fh = this.FRACTAL_WINDOW.getHeight();
+    int fw = this.FRACTAL_WINDOW.getDrawPanelWidth();
+    int fh = this.FRACTAL_WINDOW.getDrawPanelHeight();
 
     // Normalize the new edge points of our canvas.
     double newComplexMinX = StdOps.normalize(this.rectX, 0, fw, this.FRACTAL_WINDOW.getMinComplexX(),
