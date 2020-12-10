@@ -21,9 +21,7 @@ public class FractalUITopPanel extends JPanel {
     this.FRACTAL_PANEL = drawPanel;
 
     this.DRAW_FRACTAL_BUTTON = new FractalDrawButton(this.FRACTAL_WINDOW, this.FRACTAL_PANEL);
-
     this.RESET_FRACTAL_BUTTON = new FractalResetButton(this.FRACTAL_WINDOW, this.FRACTAL_PANEL);
-    
     this.UNDO_ZOOM_FRACTAL_BUTTON = new FractalUndoZoomButton(this.FRACTAL_WINDOW, this.FRACTAL_PANEL);
 
     super.setLayout(new GridLayout(1, 3));
