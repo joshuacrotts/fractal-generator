@@ -1,3 +1,5 @@
 /.settings/
 /bin/
 mandelbrot.png
+.classpath
+.project
